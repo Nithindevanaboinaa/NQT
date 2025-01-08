@@ -8,7 +8,7 @@ CORS(app)  # Enable CORS for frontend integration
 # MongoDB Connection
 app.secret_key = 'your_secret_key'
 
-MONGO_URI = "mongodb+srv://nithin:nithin@cluster0.ohw9t2m.mongodb.net/progress_tracker?retryWrites=true&w=majority&appName=Cluster0"
+MONGO_URI = "mongodb+srv://nithind:nithind@cluster0.zhl2w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(MONGO_URI)
 db = client.get_database('progress_tracker')
 
