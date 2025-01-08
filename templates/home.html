@@ -148,10 +148,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", async () => {
-        const response = await fetch("get_progress");
-        const progressData = await response.json();
+      document.addEventListener("DOMContentLoaded", () => {
+        // Section keys for LocalStorage
+        const sections = [
+          "Arrays_Progress",
+          "Strings_Progress",
+          "NumberSystem_Progress",
+          "Numbers_Progress",
+          "Sorting_Progress",
+        ];
 
+        // Function to get progress from LocalStorage
+        function getProgress() {
+          const progress = {};
+          sections.forEach((section) => {
+            const storedValue = JSON.parse(localStorage.getItem(section)) || {};
+            const completed = Object.values(storedValue).filter(
+              (done) => done
+            ).length;
+            const total = Object.keys(storedValue).length;
+            progress[section] =
+              total > 0 ? Math.round((completed / total) * 100) : 0;
+          });
+          return progress;
+        }
+
+        // Update individual progress bars
         function updateProgressBar(id, progress) {
           const bar = document.getElementById(id);
           bar.style.width = `${progress}%`;
@@ -160,55 +182,63 @@
           bar.classList.toggle("bg-success", progress >= 50);
         }
 
-        // Update progress bars
-        updateProgressBar("arraysProgress", progressData.arrays);
-        updateProgressBar("stringsProgress", progressData.strings);
-        updateProgressBar("numbersystemProgress", progressData.numbersystem);
-        updateProgressBar("numbersProgress", progressData.numbers);
-        updateProgressBar("sortingProgress", progressData.sorting);
+        // Update all progress bars and chart
+        function updateDashboard() {
+          const progress = getProgress();
+          updateProgressBar("arraysProgress", progress.Arrays_Progress);
+          updateProgressBar("stringsProgress", progress.Strings_Progress);
+          updateProgressBar(
+            "numbersystemProgress",
+            progress.NumberSystem_Progress
+          );
+          updateProgressBar("numbersProgress", progress.Numbers_Progress);
+          updateProgressBar("sortingProgress", progress.Sorting_Progress);
 
-        // Overall progress chart
-        const ctx = document.getElementById("progressChart").getContext("2d");
-        new Chart(ctx, {
-          type: "doughnut",
-          data: {
-            labels: [
-              "Arrays",
-              "Strings",
-              "Number System",
-              "Numbers",
-              "Sorting",
-            ],
-            datasets: [
-              {
-                data: [
-                  progressData.arrays,
-                  progressData.strings,
-                  progressData.numbersystem,
-                  progressData.numbers,
-                  progressData.sorting,
-                ],
-                backgroundColor: [
-                  "#28a745",
-                  "#007bff",
-                  "#ffc107",
-                  "#17a2b8",
-                  "#dc3545",
-                ],
-                borderColor: ["#ffffff"],
-                borderWidth: 2,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: "bottom",
+          // Update doughnut chart
+          const ctx = document.getElementById("progressChart").getContext("2d");
+          new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: [
+                "Arrays",
+                "Strings",
+                "Number System",
+                "Numbers",
+                "Sorting",
+              ],
+              datasets: [
+                {
+                  data: [
+                    progress.Arrays_Progress,
+                    progress.Strings_Progress,
+                    progress.NumberSystem_Progress,
+                    progress.Numbers_Progress,
+                    progress.Sorting_Progress,
+                  ],
+                  backgroundColor: [
+                    "#28a745",
+                    "#007bff",
+                    "#ffc107",
+                    "#17a2b8",
+                    "#dc3545",
+                  ],
+                  borderColor: ["#ffffff"],
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                },
               },
             },
-          },
-        });
+          });
+        }
+
+        updateDashboard();
       });
     </script>
   </body>
