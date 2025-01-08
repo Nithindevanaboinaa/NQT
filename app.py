@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend integration
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins # Enable CORS for frontend integration
 
 # MongoDB Connection
 app.secret_key = 'your_secret_key'

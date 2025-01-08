@@ -149,7 +149,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        const response = await fetch("http://127.0.0.1:5000/get_progress");
+        const response = await fetch("get_progress");
         const progressData = await response.json();
 
         function updateProgressBar(id, progress) {

@@ -55,7 +55,7 @@
         async function loadQuestions() {
           // Fetch questions from the server
           const response = await fetch(
-            "http://127.0.0.1:5000/get_questions/Strings"
+            "/get_questions/Strings"
           );
           const questions = await response.json();
 
