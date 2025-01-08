@@ -50,22 +50,31 @@
           .getElementById("taskTable")
           .querySelector("tbody");
         const progressBar = document.getElementById("progressBar");
+        const LOCAL_STORAGE_KEY = "Strings_Progress"; // LocalStorage key for strings progress
 
-        async function loadTasks() {
+        async function loadQuestions() {
+          // Fetch questions from the server
           const response = await fetch(
             "http://127.0.0.1:5000/get_questions/Strings"
           );
-          const tasks = await response.json();
+          const questions = await response.json();
+
+          // Load progress from LocalStorage
+          const progress =
+            JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {};
 
           taskTable.innerHTML = "";
-          tasks.forEach((task, index) => {
+          questions.forEach((question, index) => {
+            const done = progress[question.question] || false; // Check progress
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${index + 1}</td>
-              <td>${task.question}</td>
-              <td><a href="${task.url}" class="text-primary">Solution</a></td>
+              <td>${question.question}</td>
+              <td><a href="${
+                question.url
+              }" class="text-primary">Solution</a></td>
               <td><input type="checkbox" class="doneCheckbox" ${
-                task.done ? "checked" : ""
+                done ? "checked" : ""
               }></td>
             `;
             taskTable.appendChild(row);
@@ -74,26 +83,14 @@
           updateProgress();
         }
 
-        async function updateTask(question, done) {
-          await fetch("http://127.0.0.1:5000/update_done", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ page: "Strings", question, done }),
+        function saveProgress() {
+          const checkboxes = document.querySelectorAll(".doneCheckbox");
+          const progress = {};
+          checkboxes.forEach((checkbox) => {
+            const question = checkbox.closest("tr").children[1].textContent;
+            progress[question] = checkbox.checked;
           });
-          updateProgress();
-        }
-
-        async function resetProgress() {
-          const response = await fetch(
-            "http://127.0.0.1:5000/reset_progress/Strings",
-            {
-              method: "POST",
-            }
-          );
-          if (response.ok) {
-            await loadTasks();
-            alert("Progress reset successfully!");
-          }
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
         }
 
         function updateProgress() {
@@ -111,16 +108,21 @@
 
         document.addEventListener("change", (e) => {
           if (e.target.classList.contains("doneCheckbox")) {
-            const question = e.target.closest("tr").children[1].textContent;
-            updateTask(question, e.target.checked);
+            saveProgress();
+            updateProgress();
           }
         });
 
         document
           .getElementById("resetProgress")
-          .addEventListener("click", resetProgress);
+          .addEventListener("click", () => {
+            const checkboxes = document.querySelectorAll(".doneCheckbox");
+            checkboxes.forEach((checkbox) => (checkbox.checked = false));
+            saveProgress();
+            updateProgress();
+          });
 
-        loadTasks();
+        loadQuestions();
       });
     </script>
 
