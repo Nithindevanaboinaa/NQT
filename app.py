@@ -6,8 +6,11 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend integration
 
 # MongoDB Connection
-client = MongoClient("mongodb+srv://nithin:nithin@cluster0.ohw9t2m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-db = client['progress_tracker']
+app.secret_key = 'your_secret_key'
+
+MONGO_URI = "mongodb+srv://nithin:nithin@cluster0.ohw9t2m.mongodb.net/progress_tracker?retryWrites=true&w=majority&appName=Cluster0"
+client = MongoClient(MONGO_URI)
+db = client.get_database('progress_tracker')
 
 @app.route('/')
 def home():
