@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Admin Panel: Manage Questions</h1>
+    <div class="card p-4 mt-4">
+      <form id="addQuestionForm">
+        <div class="mb-3">
+          <label for="pageSelect" class="form-label">Which page to add:</label>
+          <select id="pageSelect" class="form-select" required>
+            <option value="Arrays">Arrays</option>
+            <option value="Strings">Strings</option>
+            <option value="Numbers">Numbers</option>
+            <option value="NumberSystem">Number System</option>
+            <option value="Sorting">Sorting</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="questionName" class="form-label">Name of the Question:</label>
+          <input type="text" id="questionName" class="form-control" placeholder="Enter question name" required>
+        </div>
+        <div class="mb-3">
+          <label for="questionURL" class="form-label">URL of the Question:</label>
+          <input type="url" id="questionURL" class="form-control" placeholder="Enter question URL" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Question</button>
+      </form>
+    </div>
+
+    <div class="card p-4 mt-4">
+      <h3>Delete a Question</h3>
+      <form id="deleteQuestionForm">
+        <div class="mb-3">
+          <label for="deletePageSelect" class="form-label">Which page to delete from:</label>
+          <select id="deletePageSelect" class="form-select" required>
+            <option value="Arrays">Arrays</option>
+            <option value="Strings">Strings</option>
+            <option value="Numbers">Numbers</option>
+            <option value="NumberSystem">Number System</option>
+            <option value="Sorting">Sorting</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="deleteQuestionName" class="form-label">Name of the Question to Delete:</label>
+          <input type="text" id="deleteQuestionName" class="form-control" placeholder="Enter question name to delete" required>
+        </div>
+        <button type="submit" class="btn btn-danger">Delete Question</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const addForm = document.getElementById("addQuestionForm");
+      const deleteForm = document.getElementById("deleteQuestionForm");
+
+      addForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const page = document.getElementById("pageSelect").value;
+        const questionName = document.getElementById("questionName").value;
+        const questionURL = document.getElementById("questionURL").value;
+
+        const newQuestion = {
+          question: questionName,
+          url: questionURL,
+          done: false,
+        };
+
+        // Save to localStorage
+        const existingQuestions = JSON.parse(localStorage.getItem(page)) || [];
+        existingQuestions.push(newQuestion);
+        localStorage.setItem(page, JSON.stringify(existingQuestions));
+
+        alert(`Question added to ${page} page successfully!`);
+        addForm.reset();
+      });
+
+      deleteForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const page = document.getElementById("deletePageSelect").value;
+        const questionName = document.getElementById("deleteQuestionName").value;
+
+        // Fetch existing questions from localStorage
+        let existingQuestions = JSON.parse(localStorage.getItem(page)) || [];
+
+        // Filter out the question to be deleted
+        const updatedQuestions = existingQuestions.filter(
+          (question) => question.question !== questionName
+        );
+
+        if (existingQuestions.length === updatedQuestions.length) {
+          alert(`Question "${questionName}" not found on the ${page} page.`);
+        } else {
+          localStorage.setItem(page, JSON.stringify(updatedQuestions));
+          alert(`Question "${questionName}" deleted from the ${page} page successfully!`);
+        }
+
+        deleteForm.reset();
+      });
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
