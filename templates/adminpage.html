@@ -60,54 +60,46 @@
       const addForm = document.getElementById("addQuestionForm");
       const deleteForm = document.getElementById("deleteQuestionForm");
 
-      addForm.addEventListener("submit", (e) => {
+      // Add question
+      addForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-
         const page = document.getElementById("pageSelect").value;
         const questionName = document.getElementById("questionName").value;
         const questionURL = document.getElementById("questionURL").value;
 
-        const newQuestion = {
-          question: questionName,
-          url: questionURL,
-          done: false,
-        };
+        const response = await fetch("http://127.0.0.1:5000/add_question", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ page, question: questionName, url: questionURL }),
+        });
 
-        // Save to localStorage
-        const existingQuestions = JSON.parse(localStorage.getItem(page)) || [];
-        existingQuestions.push(newQuestion);
-        localStorage.setItem(page, JSON.stringify(existingQuestions));
-
-        alert(`Question added to ${page} page successfully!`);
-        addForm.reset();
+        if (response.ok) {
+          alert(`Question added to ${page} page successfully!`);
+          addForm.reset();
+        } else {
+          alert("Error adding question!");
+        }
       });
 
-      deleteForm.addEventListener("submit", (e) => {
+      // Delete question
+      deleteForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-
         const page = document.getElementById("deletePageSelect").value;
         const questionName = document.getElementById("deleteQuestionName").value;
 
-        // Fetch existing questions from localStorage
-        let existingQuestions = JSON.parse(localStorage.getItem(page)) || [];
+        const response = await fetch("http://127.0.0.1:5000/delete_question", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ page, question: questionName }),
+        });
 
-        // Filter out the question to be deleted
-        const updatedQuestions = existingQuestions.filter(
-          (question) => question.question !== questionName
-        );
-
-        if (existingQuestions.length === updatedQuestions.length) {
-          alert(`Question "${questionName}" not found on the ${page} page.`);
-        } else {
-          localStorage.setItem(page, JSON.stringify(updatedQuestions));
-          alert(`Question "${questionName}" deleted from the ${page} page successfully!`);
-        }
-
+        const result = await response.json();
+        alert(result.message);
         deleteForm.reset();
       });
     });
   </script>
-
+  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
